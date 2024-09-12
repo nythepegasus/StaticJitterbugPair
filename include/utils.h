@@ -27,7 +27,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
-#include "libimobiledevice-glue/glue.h"
+#include "glue.h"
 
 #define MAC_EPOCH 978307200
 
