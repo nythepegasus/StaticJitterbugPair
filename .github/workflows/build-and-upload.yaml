@@ -1,0 +1,48 @@
+name: Build and Upload Jitterbugpair
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Cache APT packages
+        uses: actions/cache@v3
+        with:
+          path: /var/cache/apt
+          key: ${{ runner.os }}-apt-${{ hashFiles('Makefile') }}
+          restore-keys: |
+            ${{ runner.os }}-apt-
+
+      - name: Cache APT list
+        uses: actions/cache@v3
+        with:
+          path: /var/lib/apt/lists
+          key: ${{ runner.os }}-apt-list-${{ hashFiles('Makefile') }}
+          restore-keys: |
+            ${{ runner.os }}-apt-list-
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libssl-dev
+
+      - name: Run make
+        run: |
+          make
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: jitterbugpair
+          path: build/jitterbugpair

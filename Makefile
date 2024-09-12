@@ -1,48 +1,32 @@
-LIBUSBMUXD_CFLAGS := $(shell pkg-config --cflags libusbmuxd-2.0)
-LIBUSBMUXD_LDFLAGS := $(shell pkg-config --libs libusbmuxd-2.0)
-LIBIMOBILEDEVICE_CFLAGS := $(shell pkg-config --cflags libimobiledevice-1.0)
-LIBIMOBILEDEVICE_LDFLAGS := $(shell pkg-config --libs libimobiledevice-1.0)
-OPENSSL_CFLAGS := $(shell pkg-config --cflags openssl)
-OPENSSL_LDFLAGS := $(shell pkg-config --libs openssl)
+.DEFAULT_GOAL := default
+
+UNAME_S := $(shell uname -s)
 
 CC := gcc
-LD := gcc
-CFLAGS := -DHAVE_CONFIG_H -ILibraries/include -ILibraries/libimobiledevice -ILibraries/libimobiledevice/common -ILibraries/libimobiledevice/include $(LIBUSBMUXD_CFLAGS) $(LIBIMOBILEDEVICE_CFLAGS) $(OPENSSL_CLFAGS)
-LDFLAGS := $(LIBUSBMUXD_LDFLAGS) $(LIBIMOBILEDEVICE_LDFLAGS) $(OPENSSL_LDFLAGS)
+CFLAGS := -Iinclude/ -Llib/ -static
+LDFLAGS := -lssl -lcrypto -lm -limobiledevice-1.0 -limobiledevice-glue-1.0 -lz -lzstd
+OBJS := lib/libimobiledevice-1.0.a lib/libimobiledevice-glue-1.0.a lib/libplist-2.0.a lib/libusbmuxd-2.0.a
 
-# path macros
-BUILD_PATH := build
+ALL_TARGETS := build/jitterbugpair
 
-# compile macros
-TARGET_NAME := jitterbugpair
-ifeq ($(OS),Windows_NT)
-	TARGET_NAME := $(addsuffix .exe,$(TARGET_NAME))
+ifeq ($(UNAME_S), Linux)
 endif
-TARGET := $(BUILD_PATH)/$(TARGET_NAME)
 
-# src files & obj files
-SRC := JitterbugPair/main.c Libraries/libimobiledevice/common/debug.c Libraries/libimobiledevice/common/userpref.c Libraries/libimobiledevice/common/utils.c
-OBJ := $(addprefix $(BUILD_PATH)/, $(addsuffix .o, $(notdir $(basename $(SRC)))))
 
-# default rule
-default: all
+default: $(ALL_TARGETS)
 
-# non-phony targets
-$(TARGET): $(OBJ)
-	$(LD) $(CFLAGS) $(LDFLAGS) -o $@ $^
+build/%: src/%.c
+	@mkdir -p build
+	$(CC) -o $@ $^ $(CFLAGS) $(OBJS) $(LDFLAGS)
 
-$(BUILD_PATH)/%.o: $(BUILD_PATH)/%.c*
-	$(CC) $(CFLAGS) -c -o $@ $<
-
-$(BUILD_PATH)/%.c: $(SRC)
-	mkdir -p $(BUILD_PATH) || true
-	cp $^ $(BUILD_PATH)/
-
-# phony rules
-.PHONY: all
-all: $(TARGET)
-
-.PHONY: clean
 clean:
-	@echo CLEAN $(CLEAN_LIST)
-	@rm -rf $(BUILD_PATH)
+	rm -fr build/
+
+runnjitterbugpair: build/jitterbugpair
+	@true
+
+runn%:
+	$<
+	@echo
+
+.PHONY: default run clean
