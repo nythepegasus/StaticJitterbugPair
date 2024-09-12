@@ -14,23 +14,18 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Cache APT packages
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: /var/cache/apt
           key: ${{ runner.os }}-apt-${{ hashFiles('Makefile') }}
           restore-keys: |
             ${{ runner.os }}-apt-
-
-      - name: Cache APT list
-        uses: actions/cache@v3
-        with:
-          path: /var/lib/apt/lists
-          key: ${{ runner.os }}-apt-list-${{ hashFiles('Makefile') }}
-          restore-keys: |
-            ${{ runner.os }}-apt-list-
+          exclude: |
+            /var/cache/apt/archives/partial
+            /var/cache/apt/archives/lock
 
       - name: Install dependencies
         run: |
@@ -42,7 +37,7 @@ jobs:
           make
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: jitterbugpair
           path: build/jitterbugpair
