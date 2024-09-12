@@ -30,7 +30,7 @@
 extern "C" {
 #endif
 
-#include <libimobiledevice/libimobiledevice.h>
+#include "libimobiledevice.h"
 
 /** Error Codes */
 typedef enum {
