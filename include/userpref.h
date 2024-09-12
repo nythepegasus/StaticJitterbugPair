@@ -23,22 +23,13 @@
 #ifndef __USERPREF_H
 #define __USERPREF_H
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#if defined(HAVE_OPENSSL) || defined(HAVE_MBEDTLS)
 typedef struct {
 	unsigned char *data;
 	unsigned int size;
 } key_data_t;
-#else
-#include <gnutls/gnutls.h>
-typedef gnutls_datum_t key_data_t;
-#endif
 
 #include <stdint.h>
-#include <plist/plist.h>
+#include "plist/plist.h"
 
 #define USERPREF_DEVICE_CERTIFICATE_KEY "DeviceCertificate"
 #define USERPREF_ESCROW_BAG_KEY "EscrowBag"
@@ -69,13 +60,8 @@ userpref_error_t userpref_save_pair_record(const char *udid, uint32_t device_id,
 userpref_error_t userpref_delete_pair_record(const char *udid);
 
 userpref_error_t pair_record_generate_keys_and_certs(plist_t pair_record, key_data_t public_key);
-#if  defined(HAVE_OPENSSL) || defined(HAVE_MBEDTLS)
 userpref_error_t pair_record_import_key_with_name(plist_t pair_record, const char* name, key_data_t* key);
 userpref_error_t pair_record_import_crt_with_name(plist_t pair_record, const char* name, key_data_t* cert);
-#else
-userpref_error_t pair_record_import_key_with_name(plist_t pair_record, const char* name, gnutls_x509_privkey_t key);
-userpref_error_t pair_record_import_crt_with_name(plist_t pair_record, const char* name, gnutls_x509_crt_t cert);
-#endif
 
 userpref_error_t pair_record_get_host_id(plist_t pair_record, char** host_id);
 userpref_error_t pair_record_set_host_id(plist_t pair_record, const char* host_id);
