@@ -15,22 +15,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Cache APT packages
-        uses: actions/cache@v4
-        with:
-          path: /var/cache/apt
-          key: ${{ runner.os }}-apt-${{ hashFiles('Makefile') }}
-          restore-keys: |
-            ${{ runner.os }}-apt-
-          exclude: |
-            /var/cache/apt/archives/partial
-            /var/cache/apt/archives/lock
-
+        
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential libssl-dev tar
+          sudo apt-get install -y build-essential libssl-dev
 
       - name: Run make
         run: |
