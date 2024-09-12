@@ -1,4 +1,4 @@
-name: Build and Upload Jitterbugpair
+name: Build
 
 on:
   push:
